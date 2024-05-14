@@ -1,0 +1,17 @@
+.trPosition {
+    position: relative;
+    cursor: pointer;
+}
+
+.trPosition img {
+    border-radius: 8px;
+}
+
+table {
+    border-spacing: 10px;
+    text-align: left;
+}
+
+td {
+
+}

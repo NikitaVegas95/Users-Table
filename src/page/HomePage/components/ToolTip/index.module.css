@@ -1,0 +1,11 @@
+.container {
+    position: absolute;
+    inset: -10px;
+    width: 100%;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.img {
+    border-radius: 16px;
+}

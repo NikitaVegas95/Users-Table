@@ -1,4 +1,5 @@
 import { ChangeEvent } from 'react';
+import classes from './index.module.css';
 
 interface ISearchInputProps {
   placeholder: string;
@@ -14,6 +15,7 @@ const SearchInput = (props:ISearchInputProps) => {
 
   return (
     <input
+      className={classes.input}
       type={type}
       placeholder={placeholder}
       onChange={onChange}

@@ -3,19 +3,19 @@ import { MouseEventHandler } from 'react';
 interface IButtonProps {
   text: string;
   onClick: MouseEventHandler<HTMLButtonElement>
-  type: TSearchButton
+  typeButton: TSearchButton
 }
 
 type TSearchButton =
   | 'reset'
 
 const SearchButton = (props:IButtonProps) => {
-  const {text, onClick, type} = props
+  const {text, onClick, typeButton} = props
 
   return (
     <button
       onClick={onClick}
-      type={type}
+      type={typeButton}
     >
       {
         text

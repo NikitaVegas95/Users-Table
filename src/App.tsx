@@ -1,10 +1,10 @@
 import './App.css'
-import Table from './page/components/Table';
+import HomePage from './page/HomePage';
 
 function App() {
 
   return (
-    <Table/>
+    <HomePage/>
   )
 }
 
