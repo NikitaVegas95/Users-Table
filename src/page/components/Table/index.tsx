@@ -1,39 +1,73 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { getBaseUrl } from '../../../network/instance/config.ts';
 import { IUserInfo } from './type.ts';
+import SearchButton from '../SearchButton';
+import SearchInput from '../SearchInput';
+import { debounce } from '../../../helpers/debounce.ts';
 
 export const Table = () => {
-  const [data, setData] = useState<IUserInfo>()
+  const [dataUserInfo, setDataUserInfo] = useState<IUserInfo>();
+  const [inputValue, setInputValue] = useState('');
+
+  const onChangeInputValue = (event: ChangeEvent<HTMLInputElement>) => {
+    return setInputValue(event.target.value)
+  }
+  const onClick = () => {
+    return setInputValue('')
+  }
+
   interface IGetUrl {
-    url: string
+    url: string;
   }
 
   const getAllUsersInfo = async (params: IGetUrl) => {
-    const {url} = params
-    const response = await fetch(getBaseUrl() + url,{
+    const { url } = params;
+    const response = await fetch( `${ getBaseUrl() }/${ url }`, {
       method: 'GET',
-    })
+    });
     if (!response.ok) {
       throw new Error('Ошибка запроса');
     }
-    const data:IUserInfo = await response.json()
-    setData(data)
+    const data: IUserInfo = await response.json();
+    setDataUserInfo(data);
   };
 
   useEffect(() => {
-    getAllUsersInfo({ url: '/api/?results=15' })
+    getAllUsersInfo({ url: 'api/?results=15' })
       .catch(error => console.error(error));
   }, []);
 
-
-  if (!data) {
+  if (!dataUserInfo) {
     return (
       <div>loading...</div>
-    )
+    );
   }
+
+  const userFilter = dataUserInfo.results.filter(name => {
+    //фильтруем по имени исключая регистр и пробелы
+    return (`${name.name.first} ${name.name.last}`).toLowerCase().includes(inputValue.toLowerCase().trim())
+  });
+
+  const tableBody = userFilter.map((results, uuid) => {
+    //получаем список пользователей с возможностью фильтрации
+    return (
+      <tr key={uuid}>
+        <td>{`${results.name.first} ${results.name.last}`}</td>
+        <td><img src={results.picture.thumbnail} alt="аватар пользователя" /></td>
+        <td>{`${results.location.state} ${results.location.city}`}</td>
+        <td>{results.email}</td>
+        <td>{results.phone}</td>
+        <td>{results.registered.date}</td>
+      </tr>
+    )
+  })
 
   return (
     <div>
+      <form>
+        <SearchInput placeholder={'Введите имя пользователя'} onChange={debounce(onChangeInputValue, 400)} type={'text'}/>
+        <SearchButton text={'Кнопка'} type={'reset'} onClick={onClick}/>
+      </form>
       <table>
         <thead>
           <tr>
@@ -45,21 +79,14 @@ export const Table = () => {
             <th>registered date</th>
           </tr>
         </thead>
-        <tbody>
-        {data && data.results.map((res, index) => (
-          <tr key={index}>
-            <td>{res.name.first + ' ' + res.name.last}</td>
-            <td><img src={res.picture.thumbnail} alt="" /></td>
-            <td>{res.location.state + ' ' + res.location.city}</td>
-            <td>{res.email}</td>
-            <td>{res.phone}</td>
-            <td>{res.registered.date}</td>
-          </tr>
-        ))}
-        </tbody>
+        <tbody>{tableBody}</tbody>
       </table>
+      {tableBody.length === 0 && (
+        <div>
+          <p>Ничего не нашлось</p>
+        </div>
+      )}
     </div>
-
   );
 };
 
